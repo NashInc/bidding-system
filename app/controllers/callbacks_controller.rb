@@ -5,11 +5,11 @@ class CallbacksController < ApplicationController
   def test; end
 
   EXCEPTIONS = [Faraday::BadRequestError, Faraday::ResourceNotFound, Faraday::ServerError,
-                Faraday::ConnectionFailed].freeze
+                Faraday::ConnectionFailed, Faraday::UnauthorizedError].freeze
 
   # Receives Treasury Payment Callbacks for MPESA transactions
   def treasury_payment_callback
-    byebug
+    
     {
       "account_to": 'string',
       "account_to_name": 'string',

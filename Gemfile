@@ -18,6 +18,7 @@ gem "faraday"
 gem "faraday_middleware"
 gem "figaro"
 gem "faker"
+gem "rails_admin"
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", "~> 5.0"
@@ -77,3 +78,4 @@ group :test do
   gem "selenium-webdriver"
   gem "webdrivers"
 end
+gem "sassc-rails"
