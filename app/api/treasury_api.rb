@@ -15,16 +15,23 @@ class TreasuryApi
     )
   end
 
-  def get(url, page = nil)
+  def business_items(business_id, page = nil)
     request(
       http_method: :get,
-      endpoint: "#{url}?page=#{page}"
+      endpoint: "Customers/Business/#{business_id}?page=#{page}"
+    )
+  end
+
+  def get(url, business_id = nil, page = nil)
+    request(
+      http_method: :get,
+      endpoint: "#{url}?businessId=#{business_id}&page=#{page}"
     )
   end
 
   def post(url, body)
-    puts "Request Body:: "
-    puts body
+    puts 'Request Body:: '
+    puts body.to_json
     request(
       http_method: :post,
       endpoint: url.to_s,

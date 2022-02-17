@@ -3,7 +3,6 @@
 # This model deals with bidding system Customers/Players
 class Customer < ApplicationRecord
   @api = TreasuryApi.new
-
   # Create a customer in treasury
   def self.post_customer_to_treasury(phone_number, name = nil)
     name = Faker::Name.unique.name if name.nil?
@@ -31,7 +30,20 @@ class Customer < ApplicationRecord
       response = @api.business_customers(business_id, page)
       @response += response['results']
       break if response['current_page'] == response['page_count']
+
+      page += 1
     end
     @response
+  end
+
+  def self.send_message_to_customer(message, customer)
+    sms = AT.sms
+
+    options = {
+      'message' => message,
+      'to' => customer.to_s,
+      'from' => ENV['short_code'].to_s
+    }
+    sms.send options
   end
 end

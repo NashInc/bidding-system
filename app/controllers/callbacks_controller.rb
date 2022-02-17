@@ -1,42 +1,33 @@
+# frozen_string_literal: true
+
+# This controller receives callbacks from External Systems
 class CallbacksController < ApplicationController
   def test; end
 
-  EXCEPTIONS = [Faraday::BadRequestError, Faraday::ResourceNotFound].freeze
+  EXCEPTIONS = [Faraday::BadRequestError, Faraday::ResourceNotFound, Faraday::ServerError,
+                Faraday::ConnectionFailed].freeze
 
-  def fetch_subscriptions
-    sms = AT.sms
-    # Set your premium product shortCode and keyword
-    short_code = '2111'
-    keyword = '2111'
-
-    last_received_id = 0
-
-    loop do
-      options = {
-        'shortCode' => short_code,
-        'keyword' => keyword,
-        'lastReceivedId' => last_received_id
-      }
-
-      subscribers = sms.fetchSubscriptions options
-
-      subscribers.each do |subscriber|
-        puts subscriber.to_yaml
-      end
-
-      # Reassign the lastReceivedId
-      break if subscribers.length < 1
-
-      last_received_id = subscribers.last.id
-
-    # NOTE: Be sure to save the lastReceivedId for next time
-    rescue AfricasTalking::AfricasTalkingException => e
-      puts "Encountered an error: #{e.message}"
-    else
-    end
+  # Receives Treasury Payment Callbacks for MPESA transactions
+  def treasury_payment_callback
+    byebug
+    {
+      "account_to": 'string',
+      "account_to_name": 'string',
+      "account_from": 'string',
+      "account_from_name": 'string',
+      "transaction_id": 'string',
+      "amount": 0,
+      "account_reference": 'string',
+      "identifier": 'string',
+      "transaction_desc": 'string'
+    }
   end
 
+  # Receives ShortCode callbacks from AfricasTalking
   def inbox
+    text_array = params['text'].scan(/\d+|[A-Za-z]+/)
+    name = text_array.first
+    amount = text_array.last
     inbox_json = {
       id: params['id'],
       linkId: params['linkId'],
@@ -53,41 +44,30 @@ class CallbacksController < ApplicationController
 
     @customer = Customer.post_customer_to_treasury(params['from']) if @customer.nil?
     # match text to an item
+    items = Item.get_items_from_treasury ENV['business_id']
 
-    
+    @item = items.find { |item| item['name'].casecmp(name).zero? }
 
-    # If text is okay
-    # create payment link
-    # send stk push
-    # else
-    # send customer text with instructions
+    if @item
+      Customer.send_message_to_customer("Bid for #{name} received. You will receive STK push shortly",
+                                        @customer['phone_no'])
+    end
+    return Customer.send_message_to_customer('The Item is not available for sale', @customer['phone_no']) if @item.nil?
 
-    # CUSTOMER
-    # {
-    #   "business_id": '017efc9a-dd56-4b2f-abdb-9b18394c132e',
-    #   "customer_business_name": 'string',
-    #   "first_name": 'string',
-    #   "last_name": 'string',
-    #   "email": 'string', # not null
-    #   "website": 'string',
-    #   "phone_no": 'string',
-    #   "address": 'string',
-    #   "city": 'string',
-    #   "country_id": 'd66bb4d3-dad5-4283-a5c0-9dadc1bc209f',
-    #   "region_name": 'string'
-    # }
+    # create an invoice for this transaction
+    @invoice = Invoice.post_invoice_to_treasury(@item, @customer)
 
-    # Link account json
-    # {
-    #   "bank_id": '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-    #   "bank_account_number": '4074785',
-    #   "bank_account_name": 'Nash Finanicial',
+    accounts = Invoice.get_collection_accounts(@invoice) if @invoice
 
-    #   "bank_account_type": 'Collection'
-    # }
+    collection_account = accounts.first['id']
+    return if @invoice.nil?
+
+    Invoice.initiate_payment(@invoice, @customer, collection_account)
   rescue *EXCEPTIONS => e
     puts e.response[:status]
     puts e.response[:header]
     puts e.response[:body]
+  rescue AfricasTalking::AfricasTalkingException => e
+    puts "AT exception: #{e.message}"
   end
 end
