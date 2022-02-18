@@ -1,6 +1,6 @@
 RailsAdmin.config do |config|
   config.asset_source = :sprockets
-  config.excluded_models= [Customer, Invoice, Callback]
+  config.excluded_models = [Callback]
   ### Popular gems integration
 
   ## == Devise ==
@@ -17,7 +17,6 @@ RailsAdmin.config do |config|
 
   ## == PaperTrail ==
   # config.audit_with :paper_trail, 'User', 'PaperTrail::Version' # PaperTrail >= 3.0.0
-
   ### More at https://github.com/railsadminteam/rails_admin/wiki/Base-configuration
 
   ## == Gravatar integration ==

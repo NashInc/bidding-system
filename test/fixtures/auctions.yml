@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  start: 2022-02-17 20:08:35
+  end: 2022-02-17 20:08:35
+  target: 9.99
+  item_id: MyString
+  item_name: MyString
+  customer_id: MyString
+  invoice_ids: 
+
+two:
+  start: 2022-02-17 20:08:35
+  end: 2022-02-17 20:08:35
+  target: 9.99
+  item_id: MyString
+  item_name: MyString
+  customer_id: MyString
+  invoice_ids: 

@@ -2,6 +2,8 @@
 
 # This class deals with Invoice Configuration
 class Invoice < ApplicationRecord
+  belongs_to :auction, optional: true
+
   @api = TreasuryApi.new
 
   # create an Invoice in Treasury
@@ -11,6 +13,8 @@ class Invoice < ApplicationRecord
       "description": 'Invoice for Auction',
       "currency_id": ENV['currency_id'],
       "notes": "Invoice for Bid #{item['name']}",
+      "is_completed": true,
+      "require_approval": false,
       "invoice_model_details": [
         {
           "item_id": item['id'],
@@ -45,5 +49,9 @@ class Invoice < ApplicationRecord
 
   def self.get_collection_accounts(invoice)
     @response = @api.get("Invoices/#{invoice['id']}/GetCollectionAccounts")
+  end
+
+  def self.get_invoice(id)
+    @invoice = @api.get("Invoices/#{id}")
   end
 end

@@ -1,0 +1,52 @@
+<%= form_with(model: auction) do |form| %>
+  <% if auction.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(auction.errors.count, "error") %> prohibited this auction from being saved:</h2>
+
+      <ul>
+        <% auction.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :start, style: "display: block" %>
+    <%= form.datetime_field :start %>
+  </div>
+
+  <div>
+    <%= form.label :end, style: "display: block" %>
+    <%= form.datetime_field :end %>
+  </div>
+
+  <div>
+    <%= form.label :target, style: "display: block" %>
+    <%= form.text_field :target %>
+  </div>
+
+  <div>
+    <%= form.label :item_id, style: "display: block" %>
+    <%= form.text_field :item_id %>
+  </div>
+
+  <div>
+    <%= form.label :item_name, style: "display: block" %>
+    <%= form.text_field :item_name %>
+  </div>
+
+  <div>
+    <%= form.label :customer_id, style: "display: block" %>
+    <%= form.text_field :customer_id %>
+  </div>
+
+  <div>
+    <%= form.label :invoice_ids, style: "display: block" %>
+    <%= form.text_field :invoice_ids %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

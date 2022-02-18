@@ -39,6 +39,14 @@ class TreasuryApi
     )
   end
 
+  def send_message(body)
+    request(
+      http_method: :post,
+      endpoint: 'Notifications/Sms',
+      body: body.to_json
+    )
+  end
+
   def base_client
     @base_client ||= Faraday.new(TREASURY_ENDPOINT) do |base_client|
       base_client.adapter Faraday.default_adapter

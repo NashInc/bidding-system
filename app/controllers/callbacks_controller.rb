@@ -9,7 +9,6 @@ class CallbacksController < ApplicationController
 
   # Receives Treasury Payment Callbacks for MPESA transactions
   def treasury_payment_callback
-    
     {
       "account_to": 'string',
       "account_to_name": 'string',
@@ -21,6 +20,16 @@ class CallbacksController < ApplicationController
       "identifier": 'string',
       "transaction_desc": 'string'
     }
+
+    @invoice = Invoice.find_by(invoice_number: params['account_reference'])
+    if @invoice
+      @invoice.attributes = {
+        paid: true
+      }
+      @invoice.save
+    else
+      # new customer stuff
+    end
   end
 
   # Receives ShortCode callbacks from AfricasTalking
@@ -28,15 +37,15 @@ class CallbacksController < ApplicationController
     text_array = params['text'].scan(/\d+|[A-Za-z]+/)
     name = text_array.first
     amount = text_array.last
-    inbox_json = {
-      id: params['id'],
-      linkId: params['linkId'],
-      text: params['text'],
-      to: params['to'],
-      date: params['date'],
-      from: params['from']
-    }
-    puts inbox_json
+    # inbox_json = {
+    #   id: params['id'],
+    #   linkId: params['linkId'],
+    #   text: params['text'],
+    #   to: params['to'],
+    #   date: params['date'],
+    #   from: params['from']
+    # }
+    # puts inbox_json
     # find or create customer
     customers = Customer.get_customers_from_treasury ENV['business_id']
 
@@ -44,6 +53,13 @@ class CallbacksController < ApplicationController
 
     @customer = Customer.post_customer_to_treasury(params['from']) if @customer.nil?
     # match text to an item
+
+    customer = Customer.find_or_initialize_by(phone_number: @customer['phone_no'])
+    customer.attributes = {
+      customer_id: @customer['id']
+    }
+    customer.save
+
     items = Item.get_items_from_treasury ENV['business_id']
 
     @item = items.find { |item| item['name'].casecmp(name).zero? }
@@ -56,6 +72,17 @@ class CallbacksController < ApplicationController
 
     # create an invoice for this transaction
     @invoice = Invoice.post_invoice_to_treasury(@item, @customer)
+
+    @auction = Auction.find_by(item_name: @item['name'])
+
+    invoice = Invoice.create({
+                               invoice_id: @invoice['id'],
+                               customer_id: customer.id,
+                               invoice_number: @invoice['invoiceNo'],
+                               amount: @invoice['amount'],
+                               auction_id: @auction ? @auction.id : nil,
+                               bid_amount: amount
+                             })
 
     accounts = Invoice.get_collection_accounts(@invoice) if @invoice
 
