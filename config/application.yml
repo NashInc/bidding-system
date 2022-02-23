@@ -9,7 +9,7 @@
 # production:
 #   stripe_api_key: sk_live_EeHnL644i6zo4Iyq4v1KdV9H
 #   stripe_publishable_key: pk_live_9lcthxpSIHbGwmdO941O1XVU
-short_code: "20384"
+short_code: "5412"
 business_id: "017efc9a-dd56-4b2f-abdb-9b18394c132e"
 currency_id: "3f85deaf-93c0-4666-89ba-6b4325ff9148"
 country_id: "d66bb4d3-dad5-4283-a5c0-9dadc1bc209f"
@@ -20,10 +20,12 @@ business_bank_id: "017f029b-0717-4d9e-8c2e-a4ca5b1b8e06"
 
 currency_code: "KES"
 
+item_id: "017f016a-cda6-4aef-89b1-2e2b815f6c16"
+
 
 # AfricasTalking 
-username: "nashafrica"
-api_key: "11b1bcbc6576ee6379efccb7b0a06d2060395c0734e7d2155a5b2359533e30d2"
+username: "sandbox"
+api_key: "bab24092605e789894bd50f1430a63973e9156863d3f4b35e7a9a4b4e1c28073"
 
 
 

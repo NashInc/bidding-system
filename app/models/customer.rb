@@ -2,6 +2,8 @@
 
 # This model deals with bidding system Customers/Players
 class Customer < ApplicationRecord
+  has_many :invoices
+
   @api = TreasuryApi.new
   # Create a customer in treasury
   def self.post_customer_to_treasury(phone_number, name = nil)

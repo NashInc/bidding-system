@@ -3,6 +3,7 @@
 # This class deals with Invoice Configuration
 class Invoice < ApplicationRecord
   belongs_to :auction, optional: true
+  belongs_to :customer, optional: true
 
   @api = TreasuryApi.new
 

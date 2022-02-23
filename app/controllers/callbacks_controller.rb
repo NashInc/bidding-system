@@ -9,6 +9,7 @@ class CallbacksController < ApplicationController
 
   # Receives Treasury Payment Callbacks for MPESA transactions
   def treasury_payment_callback
+    @api = TreasuryApi.new
     {
       "account_to": 'string',
       "account_to_name": 'string',
@@ -27,9 +28,51 @@ class CallbacksController < ApplicationController
         paid: true
       }
       @invoice.save
+      @invoice.customer.update(
+        name: params['account_from_name']
+      )
     else
       # new customer stuff
+      customers = Customer.get_customers_from_treasury ENV['business_id']
+
+      @customer = customers.find { |customer| customer['phone_no'] == params['account_from'] }
+
+      if @customer.nil?
+        @customer = Customer.post_customer_to_treasury(params['account_from'],
+                                                       params['account_from_name'])
+      end
+      # match text to an item
+
+      customer = Customer.find_or_initialize_by(phone_number: @customer['phone_no'])
+      customer.attributes = {
+        customer_id: @customer['id'],
+        name: params['account_from_name']
+      }
+      customer.save
+
+      @item = @api.get("Items/#{ENV['item_id']}")
+
+      @invoice = Invoice.post_invoice_to_treasury(@item, @customer)
+
+      @auction = Auction.find_by(item_name: @item['name'])
+
+      invoice = Invoice.create({
+                                 invoice_id: @invoice['id'],
+                                 customer_id: customer.id,
+                                 invoice_number: @invoice['invoiceNo'],
+                                 amount: @invoice['amount'],
+                                 auction_id: @auction ? @auction.id : nil,
+                                 bid_amount: params['account_reference']
+                               })
+                            
+      message = "Your bid for #{@item['name']} with amount #{params['account_reference']} has been received"
+      Customer.send_message_to_customer(message, params['account_from'])
+
     end
+  rescue *EXCEPTIONS => e
+    puts e.response[:status]
+    puts e.response[:header]
+    puts e.response[:body]
   end
 
   # Receives ShortCode callbacks from AfricasTalking
