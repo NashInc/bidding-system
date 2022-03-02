@@ -4,7 +4,11 @@ class ItemsController < ApplicationController
   # GET /items or /items.json
   def index
     @items = Item.all
-    render json: @items
+    items_response = []
+    @items.each do |item|
+      items_response = item.builder
+    end
+    render json: items_response
   end
 
   # GET /items/1 or /items/1.json
