@@ -19,6 +19,9 @@ gem 'faraday'
 gem 'faraday_middleware'
 gem 'figaro'
 gem 'rails_admin'
+gem 'rack-cors'
+gem 'cloudinary'
+gem "image_processing"
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem 'puma', '~> 5.0'

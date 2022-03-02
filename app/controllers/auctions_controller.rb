@@ -4,6 +4,7 @@ class AuctionsController < ApplicationController
   # GET /auctions or /auctions.json
   def index
     @auctions = Auction.all
+    render json: @auctions
   end
 
   # GET /auctions/1 or /auctions/1.json

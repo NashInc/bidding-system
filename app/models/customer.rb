@@ -39,19 +39,19 @@ class Customer < ApplicationRecord
   end
 
   def self.send_message_to_customer(message, customer)
-    # sms = AT.sms
+    sms = AT.sms
 
-    # options = {
-    #   'message' => message,
-    #   'to' => customer.to_s,
-    #   'from' => ENV['short_code'].to_s
-    # }
-    # sms.send options
-
-    body = {
-      message: message,
-      recipients: [customer.to_s]
+    options = {
+      'message' => message,
+      'to' => customer.to_s,
+      'from' => ENV['short_code'].to_s
     }
-    @api.send_message(body)
+    sms.send options
+
+    # body = {
+    #   message: message,
+    #   recipients: [customer.to_s]
+    # }
+    # @api.send_message(body)
   end
 end

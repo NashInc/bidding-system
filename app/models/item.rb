@@ -1,4 +1,12 @@
 class Item < ApplicationRecord
+  has_one_attached :image
+
+  def image_url
+    return nil unless image.attached?
+
+    url_for(image)
+  end
+
   @api = TreasuryApi.new
   def self.post_item_to_treasury
     {

@@ -1,0 +1,19 @@
+---
+development:
+  cloud_name: nasheq
+  api_key: '588215186866619'
+  api_secret: 586WVz3p3g_PfkuH0pFWxQ1lJFg
+  enhance_image_tag: true
+  static_file_support: false
+production:
+  cloud_name: nasheq
+  api_key: '588215186866619'
+  api_secret: 586WVz3p3g_PfkuH0pFWxQ1lJFg
+  enhance_image_tag: true
+  static_file_support: true
+test:
+  cloud_name: nasheq
+  api_key: '588215186866619'
+  api_secret: 586WVz3p3g_PfkuH0pFWxQ1lJFg
+  enhance_image_tag: true
+  static_file_support: false
