@@ -1,6 +1,7 @@
 class Item < ApplicationRecord
   include Rails.application.routes.url_helpers
   has_one_attached :image
+  has_many :auction
 
   def image_url
     return nil unless image.attached?
@@ -34,10 +35,22 @@ class Item < ApplicationRecord
     loop do
       response = @api.get('Items', business_id, page)
       @response += response['results']
+      break if response['page_count'] == 0
       break if response['current_page'] == response['page_count']
 
       page += 1
     end
+
+    @response.each do |item|
+      @item = Item.find_or_initialize_by(item_id: item['id'])
+      @item.attributes = {
+        name: item['name'],
+        price: item['price'],
+        description: item['description']
+      }
+      @item.save!
+    end
+
     @response
   end
 end

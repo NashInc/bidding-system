@@ -6,10 +6,11 @@ class Session
 
   # GET treasury token
   def self.token
-    url = URI('http://identity.nashglobal.co/connect/token')
+    url = URI('https://identity.nashglobal.biz/connect/token')
 
     http = Net::HTTP.new(url.host, url.port)
     request = Net::HTTP::Post.new(url)
+    http.use_ssl = true
     request['Content-Type'] = 'application/x-www-form-urlencoded'
     request.body = 'client_id=Auction&client_secret=Auction&grant_type=client_credentials&scope=NashTreasuryAPI'
 

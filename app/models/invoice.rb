@@ -14,6 +14,7 @@ class Invoice < ApplicationRecord
       "description": 'Invoice for Auction',
       "currency_id": ENV['currency_id'],
       "notes": "Invoice for Bid #{item['name']}",
+      "due_date": Date.today.to_s,
       "is_completed": true,
       "require_approval": false,
       "invoice_model_details": [

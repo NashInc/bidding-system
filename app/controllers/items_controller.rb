@@ -3,6 +3,7 @@ class ItemsController < ApplicationController
 
   # GET /items or /items.json
   def index
+    Item.get_items_from_treasury ENV['business_id']
     @items = Item.all
     items_response = []
     @items.each do |item|

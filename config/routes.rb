@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
-  resources :auctions
+  resources :auctions do 
+    post "send_push", to: "auctions#send_stk_push"
+  end
+
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   resources :invoices
   resources :items

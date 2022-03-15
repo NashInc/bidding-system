@@ -23,6 +23,7 @@ class Customer < ApplicationRecord
     @response = @api.post('Customers', params)
   end
 
+  # GET CUSTOMERS FROM TREASURY
   def self.get_customers_from_treasury(business_id)
     page = 1
 
@@ -31,6 +32,7 @@ class Customer < ApplicationRecord
     loop do
       response = @api.business_customers(business_id, page)
       @response += response['results']
+      break if response['page_count'] == 0
       break if response['current_page'] == response['page_count']
 
       page += 1
@@ -53,5 +55,24 @@ class Customer < ApplicationRecord
     #   recipients: [customer.to_s]
     # }
     # @api.send_message(body)
+  end
+
+  # Update customer
+
+  def self.update_customer_on_treasury(bidding_customer)
+    name = bidding_customer.name
+    params = {
+      "business_id": ENV['business_id'],
+      "first_name": name.split.first,
+      "last_name": name.split.last,
+      "email": Faker::Internet.unique.email,
+      "website": 'string',
+      "phone_no": bidding_customer.phone_number,
+      "address": 'string',
+      "city": 'Nairobi',
+      "country_id": ENV['country_id'],
+      "region_name": 'Kenya'
+    }
+    @response = @api.put("Customers/#{bidding_customer.customer_id}", params)
   end
 end

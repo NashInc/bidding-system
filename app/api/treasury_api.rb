@@ -4,7 +4,7 @@
 class TreasuryApi
   attr_reader :response
 
-  TREASURY_ENDPOINT = 'http://coreapi.nashglobal.co/api'
+  TREASURY_ENDPOINT = 'https://coreapi.nashglobal.biz/api'
 
   def initialize; end
 
@@ -39,6 +39,16 @@ class TreasuryApi
     )
   end
 
+  def put(url, body)
+    puts 'Update Request Body:: '
+    puts body.to_json
+    request(
+      http_method: :put,
+      endpoint: url.to_s,
+      body: body.to_json
+    )
+  end
+
   def send_message(body)
     request(
       http_method: :post,
@@ -57,6 +67,8 @@ class TreasuryApi
   end
 
   def request(http_method:, endpoint:, body: {})
+    puts 'Treasury Request body:: '
+    puts body
     @response = base_client.public_send(http_method, endpoint, body)
     puts 'Treasury Response ::'
     puts @response.body

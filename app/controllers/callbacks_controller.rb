@@ -31,14 +31,17 @@ class CallbacksController < ApplicationController
       @invoice.customer.update(
         name: params['account_from_name']
       )
+      Customer.update_customer_on_treasury(@invoice.customer)
     else
       # new customer stuff
       customers = Customer.get_customers_from_treasury ENV['business_id']
-
-      @customer = customers.find { |customer| customer['phone_no'] == params['account_from'] }
+      # split_phsone = params['account_from'][3..-1] || params['account_from']\
+      split_phone = params['account_from'].split(//).last(9).join
+      split_phone = "254#{split_phone}"
+      @customer = customers.find { |customer| customer['phone_no'] == split_phone }
 
       if @customer.nil?
-        @customer = Customer.post_customer_to_treasury(params['account_from'],
+        @customer = Customer.post_customer_to_treasury(split_phone,
                                                        params['account_from_name'])
       end
       # match text to an item
@@ -64,7 +67,7 @@ class CallbacksController < ApplicationController
                                  auction_id: @auction ? @auction.id : nil,
                                  bid_amount: params['account_reference']
                                })
-                            
+
       message = "Your bid for #{@item['name']} with amount #{params['account_reference']} has been received"
       Customer.send_message_to_customer(message, params['account_from'])
 
@@ -91,10 +94,11 @@ class CallbacksController < ApplicationController
     # puts inbox_json
     # find or create customer
     customers = Customer.get_customers_from_treasury ENV['business_id']
+    split_phone = params['from'].split(//).last(9).join
+    split_phone = "254#{split_phone}"
+    @customer = customers.find { |customer| customer['phone_no'] == split_phone}
 
-    @customer = customers.find { |customer| customer['phone_no'] == params['from'] }
-
-    @customer = Customer.post_customer_to_treasury(params['from']) if @customer.nil?
+    @customer = Customer.post_customer_to_treasury(split_phone) if @customer.nil?
     # match text to an item
 
     customer = Customer.find_or_initialize_by(phone_number: @customer['phone_no'])

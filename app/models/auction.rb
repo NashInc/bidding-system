@@ -1,5 +1,10 @@
 class Auction < ApplicationRecord
   has_many :invoices
+  belongs_to :item
+
+  def builder
+    attributes.merge(item: item&.builder, paybill: ENV["paybill"])
+  end
 
   def winner
     invoices = self.invoices.where(paid: true)
@@ -20,7 +25,7 @@ class Auction < ApplicationRecord
       self
     else
       puts 'workin'
-      
+
     end
     # test = invoices.group(:bid_amount).select('count(bid_amount) as count ,[bid_amount],[id]')
     # @line_items = invoices.all(:group  => "bid_amount",:select => "bid_amount, COUNT(*) as count")

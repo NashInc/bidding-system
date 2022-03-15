@@ -4,13 +4,12 @@ business_id: "017efc9a-dd56-4b2f-abdb-9b18394c132e"
 currency_id: "3f85deaf-93c0-4666-89ba-6b4325ff9148"
 country_id: "d66bb4d3-dad5-4283-a5c0-9dadc1bc209f"
 
-item_id: "017f016a-cda6-4aef-89b1-2e2b815f6c16"
-mpesa_id: "500a23a5-ff87-433f-8b1b-f2f08ddb652c"
-business_bank_id: "017f029b-0717-4d9e-8c2e-a4ca5b1b8e06"
+item_id: "017f639e-4c0d-45ed-88c9-6c015cb521a2"
+mpesa_id: "500a23a5-ff87-433f-8b1b-f2f08ddb652c" # banks /api/Business/Banks/:business_id
+business_bank_id: "017f029b-0717-4d9e-8c2e-a4ca5b1b8e06" # linked A/c /api/Business/GetBusinessBanks/:business_id
 
+paybill: "4074785"
 currency_code: "KES"
-
-item_id: "017f016a-cda6-4aef-89b1-2e2b815f6c16"
 
 
 # AfricasTalking 
