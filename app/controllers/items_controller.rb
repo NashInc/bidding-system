@@ -7,7 +7,7 @@ class ItemsController < ApplicationController
     @items = Item.all
     items_response = []
     @items.each do |item|
-      items_response = item.builder
+      items_response << item.builder
     end
     render json: items_response
   end

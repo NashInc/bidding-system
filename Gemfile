@@ -14,14 +14,14 @@ gem 'sprockets-rails'
 gem 'sqlite3', '~> 1.4'
 
 gem 'byebug'
+gem 'cloudinary'
 gem 'faker'
 gem 'faraday'
 gem 'faraday_middleware'
 gem 'figaro'
-gem 'rails_admin'
+gem 'image_processing'
 gem 'rack-cors'
-gem 'cloudinary'
-gem "image_processing"
+gem 'rails_admin'
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem 'puma', '~> 5.0'

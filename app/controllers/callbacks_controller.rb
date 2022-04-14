@@ -32,6 +32,8 @@ class CallbacksController < ApplicationController
         name: params['account_from_name']
       )
       Customer.update_customer_on_treasury(@invoice.customer)
+      message = "Your bid for #{@invoice.auction.item.name} with amount #{@invoice.bid_amount} has been received"
+      Customer.send_message_to_customer(message, params['account_from'])
     else
       # new customer stuff
       customers = Customer.get_customers_from_treasury ENV['business_id']
@@ -52,24 +54,31 @@ class CallbacksController < ApplicationController
         name: params['account_from_name']
       }
       customer.save
+      text_array = params['account_reference'].scan(/\d+|[A-Za-z]+/)
+      name = text_array.first
+      amount = text_array.last
+      if @item = Item.find_by(name: name)
+        @item = @api.get("Items/#{@item.item_id}")
 
-      @item = @api.get("Items/#{ENV['item_id']}")
+        @invoice = Invoice.post_invoice_to_treasury(@item, @customer)
 
-      @invoice = Invoice.post_invoice_to_treasury(@item, @customer)
+        @auction = Auction.find_by(item_name: @item['name'])
 
-      @auction = Auction.find_by(item_name: @item['name'])
+        invoice = Invoice.create({
+                                   invoice_id: @invoice['id'],
+                                   customer_id: customer.id,
+                                   invoice_number: @invoice['invoiceNo'],
+                                   amount: @invoice['amount'],
+                                   auction_id: @auction ? @auction.id : nil,
+                                   bid_amount: params['account_reference']
+                                 })
 
-      invoice = Invoice.create({
-                                 invoice_id: @invoice['id'],
-                                 customer_id: customer.id,
-                                 invoice_number: @invoice['invoiceNo'],
-                                 amount: @invoice['amount'],
-                                 auction_id: @auction ? @auction.id : nil,
-                                 bid_amount: params['account_reference']
-                               })
+        message = "Your bid for #{@item['name']} with amount #{params['account_reference']} has been received"
+        Customer.send_message_to_customer(message, params['account_from'])
 
-      message = "Your bid for #{@item['name']} with amount #{params['account_reference']} has been received"
-      Customer.send_message_to_customer(message, params['account_from'])
+      else
+        puts 'No my Payment'
+      end
 
     end
   rescue *EXCEPTIONS => e
@@ -96,7 +105,7 @@ class CallbacksController < ApplicationController
     customers = Customer.get_customers_from_treasury ENV['business_id']
     split_phone = params['from'].split(//).last(9).join
     split_phone = "254#{split_phone}"
-    @customer = customers.find { |customer| customer['phone_no'] == split_phone}
+    @customer = customers.find { |customer| customer['phone_no'] == split_phone }
 
     @customer = Customer.post_customer_to_treasury(split_phone) if @customer.nil?
     # match text to an item
@@ -120,7 +129,7 @@ class CallbacksController < ApplicationController
     # create an invoice for this transaction
     @invoice = Invoice.post_invoice_to_treasury(@item, @customer)
 
-    @auction = Auction.find_by(item_name: @item['name'])
+    @auction = Auction.find_by("item_name like ?", "%#{name}%")
 
     invoice = Invoice.create({
                                invoice_id: @invoice['id'],

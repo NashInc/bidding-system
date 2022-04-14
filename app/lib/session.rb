@@ -6,7 +6,7 @@ class Session
 
   # GET treasury token
   def self.token
-    url = URI('https://identity.nashglobal.biz/connect/token')
+    url = URI('https://dev.identity.nashglobal.co/connect/token')
 
     http = Net::HTTP.new(url.host, url.port)
     request = Net::HTTP::Post.new(url)

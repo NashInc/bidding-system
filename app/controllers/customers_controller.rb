@@ -4,10 +4,12 @@ class CustomersController < ApplicationController
   # GET /customers or /customers.json
   def index
     @customers = Customer.all
+    render json: @customers.reverse
   end
 
   # GET /customers/1 or /customers/1.json
   def show
+    render json: @customer
   end
 
   # GET /customers/new

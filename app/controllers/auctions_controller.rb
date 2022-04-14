@@ -1,6 +1,7 @@
 class AuctionsController < ApplicationController
   before_action :set_auction, only: %i[show edit update destroy]
-
+  EXCEPTIONS = [Faraday::BadRequestError, Faraday::ResourceNotFound, Faraday::ServerError,
+                Faraday::ConnectionFailed, Faraday::UnauthorizedError].freeze
   # GET /auctions or /auctions.json
   def index
     @auctions = Auction.all
@@ -12,7 +13,16 @@ class AuctionsController < ApplicationController
   end
 
   # GET /auctions/1 or /auctions/1.json
-  def show; end
+  def show
+    customer_invoices = []
+
+    @auction.invoices.each do |invoice|
+      customer_invoices << invoice.attributes.merge(customer_name: invoice.customer.name,
+                                                    phone_number: invoice.customer.phone_number)
+    end
+    render json: @auction.attributes.merge(collected: @auction.invoices.where(paid: true).sum(:amount),
+                                           invoices: customer_invoices)
+  end
 
   # GET /auctions/new
   def new
@@ -89,14 +99,14 @@ class AuctionsController < ApplicationController
 
     @invoice = Invoice.post_invoice_to_treasury(@item, @customer)
 
-    @auction = Auction.find_by(item_name: @item['name'])
+    # @auction = Auction.find_by(item_name: @item['name'])
 
     invoice = Invoice.create({
                                invoice_id: @invoice['id'],
                                customer_id: customer.id,
                                invoice_number: @invoice['invoiceNo'],
                                amount: @invoice['amount'],
-                               auction_id: @auction ? @auction.id : nil,
+                               auction_id: @auction.id,
                                bid_amount: params['bid_amount']
                              })
 
@@ -110,6 +120,9 @@ class AuctionsController < ApplicationController
     puts e.response[:status]
     puts e.response[:header]
     puts e.response[:body]
+    render json: {
+      message: e.message
+    }, status: e.response[:status]
   rescue StandardError => e
     render json: {
       message: e.message
