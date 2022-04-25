@@ -9,19 +9,20 @@ class AuctionsController < ApplicationController
     @auctions.each do |auction|
       auctions_response << auction.builder
     end
-    render json: auctions_response
+    render json: auctions_response.reverse
   end
 
   # GET /auctions/1 or /auctions/1.json
   def show
     customer_invoices = []
-
+    customers = []
     @auction.invoices.each do |invoice|
+      customers << invoice.customer
       customer_invoices << invoice.attributes.merge(customer_name: invoice.customer.name,
                                                     phone_number: invoice.customer.phone_number)
     end
     render json: @auction.attributes.merge(collected: @auction.invoices.where(paid: true).sum(:amount),
-                                           invoices: customer_invoices)
+                                           invoices: customer_invoices, customers: customers)
   end
 
   # GET /auctions/new
@@ -141,6 +142,6 @@ class AuctionsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def auction_params
-    params.require(:auction).permit(:start, :end, :target, :item_id, :item_name, :customer_id, :invoice_ids)
+    params.permit(:start, :end, :target, :item_id, :item_name, :customer_id, :invoice_ids)
   end
 end

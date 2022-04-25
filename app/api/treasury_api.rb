@@ -4,7 +4,7 @@
 class TreasuryApi
   attr_reader :response
 
-  TREASURY_ENDPOINT = 'https://dev.coreapi.nashglobal.co/api'
+  TREASURY_ENDPOINT = 'https://dev.treasury.nashglobal.co/api'
 
   def initialize; end
 

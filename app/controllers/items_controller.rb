@@ -3,13 +3,13 @@ class ItemsController < ApplicationController
 
   # GET /items or /items.json
   def index
-    Item.get_items_from_treasury ENV['business_id']
+    # Item.get_items_from_treasury ENV['business_id']
     @items = Item.all
     items_response = []
     @items.each do |item|
       items_response << item.builder
     end
-    render json: items_response
+    render json: items_response.reverse
   end
 
   # GET /items/1 or /items/1.json
@@ -29,7 +29,7 @@ class ItemsController < ApplicationController
 
     respond_to do |format|
       if @item.save
-        format.html { redirect_to item_url(@item), notice: 'Item was successfully created.' }
+        format.html { redirect_to item_url(@item), notice: "Item was successfully created." }
         format.json { render :show, status: :created, location: @item }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -70,6 +70,6 @@ class ItemsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def item_params
-    params.require(:item).permit(:name, :price, :description, :image)
+    params.permit(:name, :price, :description, :image)
   end
 end
