@@ -49,6 +49,13 @@ class TreasuryApi
     )
   end
 
+  def delete(url)
+    request(
+      http_method: :delete,
+      endpoint: url.to_s
+    )
+  end
+
   def send_message(body)
     request(
       http_method: :post,

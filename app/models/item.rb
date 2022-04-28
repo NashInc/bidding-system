@@ -15,21 +15,17 @@ class Item < ApplicationRecord
 
   @api = TreasuryApi.new
 
+  def self.update_item_on_treasury(id, name, price, description)
+    @api.put("Items/#{id}", Item.item_body(name, price, description))
+  end
+
+  def self.delete_item_on_treasury(id)
+    @api.delete("Items/#{id}")
+  end
+
   # This method creates an Item on treasury
   def self.post_item_to_treasury(name, price, description)
-    @body = {
-      "Name": name.to_s,
-      "BusinessId": ENV['business_id'],
-      "Price": price.to_i,
-      "Quantity": 99_999,
-      "ItemProductType": 'Inventory',
-      "IncludeInInvoice": true,
-      "IncludeInBill": true,
-      "CurrencyId": ENV['currency_id'],
-      "Description": description.to_s
-    }
-
-    @api.post('Items', @body)
+    @api.post('Items', Item.item_body(name, price, description))
   end
 
   def self.get_items_from_treasury(business_id)
@@ -57,5 +53,19 @@ class Item < ApplicationRecord
     end
 
     @response
+  end
+
+  def self.item_body(name, price, description)
+    {
+      "Name": name.to_s,
+      "BusinessId": ENV['business_id'],
+      "Price": price.to_i,
+      "Quantity": 99_999,
+      "ItemProductType": 'Inventory',
+      "IncludeInInvoice": true,
+      "IncludeInBill": true,
+      "CurrencyId": ENV['currency_id'],
+      "Description": description.to_s
+    }
   end
 end

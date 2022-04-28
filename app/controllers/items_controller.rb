@@ -30,12 +30,13 @@ class ItemsController < ApplicationController
   def create
     @item = Item.new(item_params)
 
-    Item.post_item_to_treasury(item_params[:name], item_params[:price], item_params[:description])
+    response = Item.post_item_to_treasury(item_params[:name], item_params[:price], item_params[:description])
   rescue StandardError => e
     render json: {
       error: e
     }, status: 400
   else
+    @item.item_id = response['id']
     if @item.save
       render json: {
         success: true,
@@ -50,25 +51,40 @@ class ItemsController < ApplicationController
 
   # PATCH/PUT /items/1 or /items/1.json
   def update
-    respond_to do |format|
-      if @item.update(item_params)
-        format.html { redirect_to item_url(@item), notice: 'Item was successfully updated.' }
-        format.json { render :show, status: :ok, location: @item }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @item.errors, status: :unprocessable_entity }
-      end
+    Item.update_item_on_treasury(@item.item_id, item_params['name'], item_params['price'], item_params['description'])
+  rescue StandardError => e
+    render json: {
+      error: e
+    }
+  else
+    if @item.update(item_params)
+      render json: {
+        success: true,
+        message: 'Item updated successfully',
+        data: @item
+      }
+    else
+      render json: {
+        success: false,
+        error: @item.errors
+      }, status: 400
     end
   end
 
   # DELETE /items/1 or /items/1.json
   def destroy
+    Item.delete_item_on_treasury(@item.item_id)
+  rescue StandardError => e
+    render json: {
+      error: e
+    }, status: 400
+  else
     @item.destroy
 
-    respond_to do |format|
-      format.html { redirect_to items_url, notice: 'Item was successfully destroyed.' }
-      format.json { head :no_content }
-    end
+    render json: {
+      success: true,
+      message: 'Item deleted successfully'
+    }, status: 200
   end
 
   private
