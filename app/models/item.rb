@@ -14,17 +14,22 @@ class Item < ApplicationRecord
   end
 
   @api = TreasuryApi.new
-  def self.post_item_to_treasury
-    {
-      "Name": 'string',
-      "BusinessId": '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      "Price": 0,
-      "Quantity": 0,
+
+  # This method creates an Item on treasury
+  def self.post_item_to_treasury(name, price, description)
+    @body = {
+      "Name": name.to_s,
+      "BusinessId": ENV['business_id'],
+      "Price": price.to_i,
+      "Quantity": 99_999,
+      "ItemProductType": 'Inventory',
       "IncludeInInvoice": true,
-      "IncludeInBill": 0,
-      "CurrencyId": '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      "Description": 'string'
+      "IncludeInBill": true,
+      "CurrencyId": ENV['currency_id'],
+      "Description": description.to_s
     }
+
+    @api.post('Items', @body)
   end
 
   def self.get_items_from_treasury(business_id)

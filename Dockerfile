@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM ruby:3.0.0
-RUN apt-get update -qq && apt-get install -y nodejs libmariadb-dev-compat libmariadb-dev 
+RUN apt-get update -qq && apt-get install -y nodejs libmariadb-dev-compat libmariadb-dev libvips
 WORKDIR /app
 RUN rm -rf /app/config/master.key 
 RUN rm -rf /app/config/credentials.yml.enc

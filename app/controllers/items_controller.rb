@@ -1,9 +1,12 @@
+# frozen_string_literal: true
+
+# This contrller deals with Bid Items
 class ItemsController < ApplicationController
   before_action :set_item, only: %i[show edit update destroy]
 
   # GET /items or /items.json
   def index
-    # Item.get_items_from_treasury ENV['business_id']
+    Item.get_items_from_treasury ENV['business_id']
     @items = Item.all
     items_response = []
     @items.each do |item|
@@ -27,14 +30,21 @@ class ItemsController < ApplicationController
   def create
     @item = Item.new(item_params)
 
-    respond_to do |format|
-      if @item.save
-        format.html { redirect_to item_url(@item), notice: "Item was successfully created." }
-        format.json { render :show, status: :created, location: @item }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @item.errors, status: :unprocessable_entity }
-      end
+    Item.post_item_to_treasury(item_params[:name], item_params[:price], item_params[:description])
+  rescue StandardError => e
+    render json: {
+      error: e
+    }, status: 400
+  else
+    if @item.save
+      render json: {
+        success: true,
+        message: 'Item Saved successfully'
+      }
+    else
+      render json: {
+        error: e
+      }, status: 400
     end
   end
 
